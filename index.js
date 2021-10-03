@@ -2,8 +2,7 @@ const inquirer = require('inquirer')
 const Manager = require('./lib/Manager')
 const Engineer = require('./lib/Engineer')
 const Intern = require('./lib/Intern')
-
-let employees = []
+const fs = require('fs')
 
 
 const init = async () => {
@@ -23,13 +22,13 @@ const init = async () => {
             type: 'number',
             name: 'employeeId',
             message: "What is the employee's id number?",
-            filter: input => typeof input === 'number' ? input : 'You did not enter a number.'
+            filter: input => typeof input === 'number' ? input : null
         },
         {
             type: 'input',
             name: 'employeeEmail',
             message: "What is the employee's email?",
-            filter: input => input === /\w+@\w+\.\w+/ ? input : null
+            filter: input => input === /\w+@\w+.\w+/ ? input : null
         },
         {
             type: 'input',
@@ -68,7 +67,43 @@ const getNumEmployees = async () => {
         })
 }
 
+const buildHTML = ( employees ) => {
+    let baseHTML = `<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+    </head>
+    <body>`
+    let card
+
+    fs.writeFile('./dist/index.html', '', () => console.log('HTML file generated'))
+
+    for (let { employeeRole, employeeName, employeeId, employeeEmail, officeNumber, githubUsername, internSchool } of employees) {
+        card = `    <section>
+        <h2>
+            ${employeeName}
+        </h2>
+        <p>
+            ${employeeRole}
+        </p>
+        <ul>
+            <li>${employeeId}</li>
+            <li>Email: ${employeeEmail || ''}</li>
+            <li>${officeNumber || githubUsername || internSchool}</li>
+        </ul>
+    </section>`
+        fs.appendFile('./dist/index.html', JSON.stringify(card), () => console.log(`${employeeName} has been added to the webpage`))
+        card = ''
+    }
+    fs.appendFile('./dist/index.html', `</body>
+    </html>`, () => console.log('Webpage is complete'))
+}
+
 const main = async (num) => {
+    let employees = []
 
     for (num; num > 0; num--) {
         await init()
@@ -84,9 +119,9 @@ const main = async (num) => {
                     case 'Intern':
                         employees.push(new Intern(employeeName, employeeId, employeeEmail, internSchool))
                 }
-                console.log(employees[0])
             })
     }
+    buildHTML(employees)
 
 }
 
