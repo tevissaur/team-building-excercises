@@ -27,7 +27,7 @@ describe('Engineer Test', () => {
 
     it('Should return the engineers github username', () => {
         const result = testEngineer.getGithub()
-        const expectedResult = 'https://www.github.com/supersmartguy'
+        const expectedResult = 'supersmartguy'
 
         expect(result).toBe(expectedResult)
     })
